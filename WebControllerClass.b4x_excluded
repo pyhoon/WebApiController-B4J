@@ -1,0 +1,33 @@
+﻿' Web Controller
+' Version 1.04
+Sub Class_Globals
+	Private Request As ServletRequest 'ignore
+	Private Response As ServletResponse
+End Sub
+
+Public Sub Initialize (req As ServletRequest, resp As ServletResponse)
+	Request = req
+	Response = resp
+End Sub
+
+Public Sub Show
+	Dim strMain As String = WebApiUtils.ReadTextFile("main.html")
+	Dim strView As String = WebApiUtils.ReadTextFile("index.html")
+	Dim strJSFile As String
+	Dim strScripts As String
+	
+	strMain = WebApiUtils.BuildDocView(strMain, strView)
+	strMain = WebApiUtils.BuildHtml(strMain, Main.config)
+	If Main.SimpleResponse.Enable Then
+		If Main.SimpleResponse.Format = "Map" Then
+			strJSFile = "webapi.search.simple.map.js"
+		Else
+			strJSFile = "webapi.search.simple.js"
+		End If		
+	Else
+		strJSFile = "webapi.search.js"
+	End If
+	strScripts = $"<script src="${Main.ROOT_URL}/assets/js/${strJSFile}"></script>"$
+	strMain = WebApiUtils.BuildScript(strMain, strScripts)
+	WebApiUtils.ReturnHTML(strMain, Response)
+End Sub
