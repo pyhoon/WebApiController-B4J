@@ -1,48 +1,46 @@
 ﻿' Api Controller
-' Version 1.04
+' Version 1.05
+' For creating Controller such as ProductsController
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
 	Private HRM As HttpResponseMessage
 	Private DB As MiniORM
 	Private Method As String
-	Private Version As String 'ignore
+	Private Version As String
 	Private Elements() As String
 	Private ApiVersionIndex As Int
-	Private ControllerIndex As Int 'ignore
-	Private ElementLastIndex As Int 'ignore
+	Private ControllerIndex As Int
+	Private ElementLastIndex As Int
 	Private FirstIndex As Int
-	Private FirstElement As String 'ignore
-	'Private SecondIndex As Int
-	'Private SecondElement As String
+	Private FirstElement As String
 End Sub
 
-' Initialize Controller object
 Public Sub Initialize (req As ServletRequest, resp As ServletResponse)
 	Request = req
 	Response = resp
 	HRM.Initialize
 	HRM.SimpleResponse = Main.SimpleResponse
-	DB.Initialize(OpenDBConnection, DBEngine)
+	DB.Initialize(Main.DBOpen, Main.DBEngine)
 End Sub
 
-Private Sub DBEngine As String
-	Return Main.DBConnector.DBEngine
-End Sub
-
-Private Sub OpenDBConnection As SQL
-	Return Main.DBConnector.DBOpen
-End Sub
-
-Private Sub CloseDBConnection
-	Main.DBConnector.DBClose
-End Sub
-
-Private Sub ReturnApiResponse
+Private Sub ReturnApiResponse 'ignore
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
-' API Router
+Private Sub ReturnBadRequest
+	WebApiUtils.ReturnBadRequest(Response)
+End Sub
+
+Private Sub ReturnMethodNotAllow
+	WebApiUtils.ReturnMethodNotAllow(Response)
+End Sub
+
+Private Sub ReturnErrorUnprocessableEntity
+	WebApiUtils.ReturnErrorUnprocessableEntity(Response)
+End Sub
+
+' Api Router
 Public Sub RouteApi
 	Method = Request.Method.ToUpperCase
 	Elements = WebApiUtils.GetUriElements(Request.RequestURI)
@@ -54,15 +52,11 @@ Public Sub RouteApi
 		FirstIndex = ControllerIndex + 1
 		FirstElement = Elements(FirstIndex)
 	End If
-	'If ElementLastIndex > ControllerIndex + 1 Then
-	'	SecondIndex = ControllerIndex + 2
-	'	SecondElement = Elements(SecondIndex)
-	'End If	
-	
+
 	Select Method
 		Case "GET"
 			' Snippet: Code_WebApiUtils_03 GET Route
-			'RouteGet
+			RouteGet
 		Case "POST"
 			' Snippet: Code_WebApiUtils_04 POST Route
 			'RoutePost
@@ -74,6 +68,53 @@ Public Sub RouteApi
 			'RouteDelete
 		Case Else
 			Log("Unsupported method: " & Method)
+			ReturnMethodNotAllow
+	End Select
+End Sub
+
+' Web Router
+Public Sub RouteWeb
+	Method = Request.Method.ToUpperCase
+	Elements = WebApiUtils.GetUriElements(Request.RequestURI)
+	ElementLastIndex = Elements.Length - 1
+	ControllerIndex = Main.Element.WebControllerIndex
+	If ElementLastIndex > ControllerIndex Then
+		FirstIndex = ControllerIndex + 1
+		FirstElement = Elements(FirstIndex)
+	End If
+	
+	Select Method
+		Case "GET"
+			Select ElementLastIndex
+				Case ControllerIndex
+					' Snippet: Code_WebApiUtils_07 Show Web Page
+					'ShowPage
+					Return
+			End Select
+		Case Else
+			Log("Unsupported method: " & Method)
 			WebApiUtils.ReturnMethodNotAllow(Response)
 	End Select
+End Sub
+
+' Snippet: Code_WebApiUtils_03 GET Route
+Private Sub RouteGet
+	Select Version
+		Case "v2"
+			Select ElementLastIndex
+				Case ControllerIndex
+					' Snippet: Code_MiniORMUtils_01 Get Resources as List
+					'GetPlural
+					Return
+				Case FirstIndex
+					If IsNumber(FirstElement) = False Then
+						ReturnErrorUnprocessableEntity
+						Return
+					End If
+					' Snippet: Code_MiniORMUtils_02 Get Resource as Map by Id
+					'GetSingular(FirstElement)
+					Return
+			End Select
+	End Select
+	ReturnBadRequest
 End Sub

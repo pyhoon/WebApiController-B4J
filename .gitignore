@@ -1,0 +1,14 @@
+# ignore files
+*.b4j.meta
+*.b4j
+*.zip
+*Handler.bas
+*Filter.bas
+*Configuration.bas
+CategoriesController.bas
+ProductsController.bas
+
+# ignore ALL files in these directories
+AutoBackups/
+Objects/
+Files/

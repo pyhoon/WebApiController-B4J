@@ -2,7 +2,8 @@
 <root>
     <doclet-version-NOT-library-version>1.07</doclet-version-NOT-library-version>
 	<author>Aeric Poon</author>
-    <version>1.04</version>
-    <customClass>filenamewithoutextension:ApiControllerClass, name:Controller (Api)</customClass>
+    <version>1.05</version>
+    <customClass>filenamewithoutextension:ApiControllerClass, name:Controller (Api)</customClass>    
     <customClass>filenamewithoutextension:WebControllerClass, name:Controller (Web)</customClass>
+    <customClass>filenamewithoutextension:FindControllerClass, name:Controller (Find)</customClass>
 </root>
