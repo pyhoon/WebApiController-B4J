@@ -29,12 +29,12 @@ End Sub
 Public Sub Initialize (req As ServletRequest, resp As ServletResponse)
 	Request = req
 	Response = resp
-	HRM.Initialize
-	HRM.SimpleResponse = Main.SimpleResponse
+	HRM.Initialize	
 	DB.Initialize(Main.DBOpen, Main.DBEngine)
 End Sub
 
 Private Sub ReturnApiResponse
+	HRM.SimpleResponse = Main.SimpleResponse
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
