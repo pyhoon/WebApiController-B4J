@@ -5,7 +5,7 @@ Type=Class
 Version=9.8
 @EndOfDesignText@
 ' Find Controller
-' Version 1.05
+' Version 1.06
 ' For creating a Find Controller (with Categories and Products controllers )
 Sub Class_Globals
 	Private Request As ServletRequest
@@ -98,7 +98,7 @@ Private Sub RouteGet
 						Case "product"
 							GetFindProduct(SecondElement, ThirdElement)
 							Return
-					End Select					
+					End Select
 			End Select
 	End Select
 	ReturnBadRequest
@@ -111,9 +111,10 @@ Private Sub GetFindCategory (keyword As String, value As String)
 
 	Select keyword
 		Case "category_name", "name"
-			QueryCategoryByKeyword(Array("category_name = ?"), Array(value))
+			QueryCategoryByKeyword(Array("UPPER(category_name) LIKE ?"), Array($"%${value.ToUpperCase}%"$))
 		Case Else
 			ReturnInvalidKeywordValue
+			Return
 	End Select
 	DB.Close
 	ReturnApiResponse
@@ -129,29 +130,32 @@ Private Sub GetFindProduct (keyword As String, value As String)
 			If IsNumber(value) Then
 				QueryProductByKeyword(Array("p.id = ?"), Array(value))
 			Else
-				ReturnErrorUnprocessableEntity			
+				ReturnErrorUnprocessableEntity
+				Return
 			End If
 		Case "category_id", "cid", "catid"
 			If IsNumber(value) Then
 				QueryProductByKeyword(Array("c.id = ?"), Array(value))
 			Else
-				ReturnErrorUnprocessableEntity			
+				ReturnErrorUnprocessableEntity
+				Return
 			End If
-		Case "product_code", "code"		
-			QueryProductByKeyword(Array("p.product_code = ?"), Array(value))
-		Case "category_name", "category"					
-			QueryProductByKeyword(Array("c.category_name = ?"), Array(value))
-		Case "product_name", "name"			
-			QueryProductByKeyword(Array("p.product_name LIKE ?"), Array("%" & value & "%"))
+		Case "product_code", "code"
+			QueryProductByKeyword(Array("p.product_code = ?"), Array(value)) ' product_code is case sensitive
+		Case "category_name", "category"
+			QueryProductByKeyword(Array("UPPER(c.category_name) LIKE ?"), Array($"%${value.ToUpperCase}%"$))
+		Case "product_name", "name"
+			QueryProductByKeyword(Array("UPPER(p.product_name) LIKE ?"), Array($"%${value.ToUpperCase}%"$))
 		Case Else
 			ReturnInvalidKeywordValue
+			Return
 	End Select
 	DB.Close
 	ReturnApiResponse
 End Sub
 
 Private Sub QueryCategoryByKeyword (Condition As List, Value As List)
-	DB.Table = "tbl_category"
+	DB.Table = "tbl_categories"
 	DB.setWhereValue(Condition, Value)
 	DB.Query
 	HRM.ResponseCode = 200
@@ -161,7 +165,7 @@ End Sub
 Private Sub QueryProductByKeyword (Condition As List, Value As List)
 	DB.Table = "tbl_products p"
 	DB.Select = Array("p.*", "c.category_name")
-	DB.Join = DB.CreateORMJoin("tbl_category c", "p.category_id = c.id", "")
+	DB.Join = DB.CreateORMJoin("tbl_categories c", "p.category_id = c.id", "")
 	DB.setWhereValue(Condition, Value)
 	DB.Query
 	HRM.ResponseCode = 200

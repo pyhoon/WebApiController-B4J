@@ -5,7 +5,7 @@ Type=Class
 Version=10
 @EndOfDesignText@
 ' Api Controller
-' Version 1.05
+' Version 1.06
 ' For creating Controller such as ProductsController
 Sub Class_Globals
 	Private Request As ServletRequest
@@ -26,11 +26,11 @@ Public Sub Initialize (req As ServletRequest, resp As ServletResponse)
 	Request = req
 	Response = resp
 	HRM.Initialize
-	HRM.SimpleResponse = Main.SimpleResponse
 	DB.Initialize(Main.DBOpen, Main.DBEngine)
 End Sub
 
 Private Sub ReturnApiResponse 'ignore
+	HRM.SimpleResponse = Main.SimpleResponse
 	WebApiUtils.ReturnHttpResponse(HRM, Response)
 End Sub
 
