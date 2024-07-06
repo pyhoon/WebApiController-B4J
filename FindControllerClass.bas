@@ -2,11 +2,10 @@
 Group=Controllers
 ModulesStructureVersion=1
 Type=Class
-Version=9.8
+Version=10
 @EndOfDesignText@
 ' Find Controller
-' Version 1.06
-' For creating a Find Controller (with Categories and Products controllers )
+' Version 1.07
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -14,10 +13,12 @@ Sub Class_Globals
 	Private DB As MiniORM
 	Private Method As String
 	Private Version As String
+	Private RequestURI As String 'ignore
 	Private Elements() As String
+	Private ElementLastIndex As Int
 	Private ApiVersionIndex As Int
 	Private ControllerIndex As Int
-	Private ElementLastIndex As Int
+	Private ControllerElement As String 'ignore
 	Private FirstIndex As Int
 	Private FirstElement As String
 	Private SecondIndex As Int
@@ -29,7 +30,7 @@ End Sub
 Public Sub Initialize (req As ServletRequest, resp As ServletResponse)
 	Request = req
 	Response = resp
-	HRM.Initialize	
+	HRM.Initialize
 	DB.Initialize(Main.DBOpen, Main.DBEngine)
 End Sub
 
@@ -55,7 +56,6 @@ Private Sub ReturnErrorUnprocessableEntity
 	WebApiUtils.ReturnErrorUnprocessableEntity(Response)
 End Sub
 
-' Api Router
 Public Sub RouteApi
 	Method = Request.Method.ToUpperCase
 	Elements = WebApiUtils.GetUriElements(Request.RequestURI)
@@ -85,7 +85,7 @@ Public Sub RouteApi
 	End Select
 End Sub
 
-' Router for GET request
+' GET
 Private Sub RouteGet
 	Select Version
 		Case "v2"

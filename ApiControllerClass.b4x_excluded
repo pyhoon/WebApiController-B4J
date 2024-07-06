@@ -1,6 +1,5 @@
 ﻿' Api Controller
-' Version 1.06
-' For creating Controller such as ProductsController
+' Version 1.07
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -8,12 +7,16 @@ Sub Class_Globals
 	Private DB As MiniORM
 	Private Method As String
 	Private Version As String
+	Private RequestURI As String 'ignore
 	Private Elements() As String
+	Private ElementLastIndex As Int
 	Private ApiVersionIndex As Int
 	Private ControllerIndex As Int
-	Private ElementLastIndex As Int
+	Private ControllerElement As String 'ignore
 	Private FirstIndex As Int
 	Private FirstElement As String
+	Private SecondIndex As Int 'ignore
+	Private SecondElement As String 'ignore
 End Sub
 
 Public Sub Initialize (req As ServletRequest, resp As ServletResponse)
@@ -40,12 +43,13 @@ Private Sub ReturnErrorUnprocessableEntity
 	WebApiUtils.ReturnErrorUnprocessableEntity(Response)
 End Sub
 
-' Api Router
 Public Sub RouteApi
 	Method = Request.Method.ToUpperCase
-	Elements = WebApiUtils.GetUriElements(Request.RequestURI)
+	RequestURI = Request.RequestURI
+	Elements = WebApiUtils.GetUriElements(RequestURI)
 	ApiVersionIndex = Main.Element.ApiVersionIndex
 	ControllerIndex = Main.Element.ApiControllerIndex
+	ControllerElement = Elements(ControllerIndex)
 	Version = Elements(ApiVersionIndex)
 	ElementLastIndex = Elements.Length - 1
 	If ElementLastIndex > ControllerIndex Then
@@ -55,16 +59,12 @@ Public Sub RouteApi
 
 	Select Method
 		Case "GET"
-			' Snippet: Code_WebApiUtils_03 GET Route
 			RouteGet
 		Case "POST"
-			' Snippet: Code_WebApiUtils_04 POST Route
 			'RoutePost
 		Case "PUT"
-			' Snippet: Code_WebApiUtils_05 PUT Route
 			'RoutePut
 		Case "DELETE"
-			' Snippet: Code_WebApiUtils_06 DELETE Route
 			'RouteDelete
 		Case Else
 			Log("Unsupported method: " & Method)
@@ -72,12 +72,13 @@ Public Sub RouteApi
 	End Select
 End Sub
 
-' Web Router
 Public Sub RouteWeb
 	Method = Request.Method.ToUpperCase
-	Elements = WebApiUtils.GetUriElements(Request.RequestURI)
+	RequestURI = Request.RequestURI
+	Elements = WebApiUtils.GetUriElements(RequestURI)
 	ElementLastIndex = Elements.Length - 1
 	ControllerIndex = Main.Element.WebControllerIndex
+	ControllerElement = Elements(ControllerIndex)
 	If ElementLastIndex > ControllerIndex Then
 		FirstIndex = ControllerIndex + 1
 		FirstElement = Elements(FirstIndex)
@@ -87,17 +88,16 @@ Public Sub RouteWeb
 		Case "GET"
 			Select ElementLastIndex
 				Case ControllerIndex
-					' Snippet: Code_WebApiUtils_07 Show Web Page
 					'ShowPage
 					Return
 			End Select
 		Case Else
 			Log("Unsupported method: " & Method)
-			WebApiUtils.ReturnMethodNotAllow(Response)
+			ReturnMethodNotAllow
 	End Select
 End Sub
 
-' Snippet: Code_WebApiUtils_03 GET Route
+' GET
 Private Sub RouteGet
 	Select Version
 		Case "v2"
