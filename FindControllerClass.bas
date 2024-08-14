@@ -5,7 +5,7 @@ Type=Class
 Version=10
 @EndOfDesignText@
 ' Find Controller
-' Version 1.07
+' Version 1.08
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -13,12 +13,10 @@ Sub Class_Globals
 	Private DB As MiniORM
 	Private Method As String
 	Private Version As String
-	Private RequestURI As String 'ignore
 	Private Elements() As String
-	Private ElementLastIndex As Int
 	Private ApiVersionIndex As Int
 	Private ControllerIndex As Int
-	Private ControllerElement As String 'ignore
+	Private ElementLastIndex As Int
 	Private FirstIndex As Int
 	Private FirstElement As String
 	Private SecondIndex As Int
@@ -56,13 +54,14 @@ Private Sub ReturnErrorUnprocessableEntity
 	WebApiUtils.ReturnErrorUnprocessableEntity(Response)
 End Sub
 
+' Api Router
 Public Sub RouteApi
 	Method = Request.Method.ToUpperCase
 	Elements = WebApiUtils.GetUriElements(Request.RequestURI)
-	ElementLastIndex = Elements.Length - 1
 	ApiVersionIndex = Main.Element.ApiVersionIndex
-	Version = Elements(ApiVersionIndex)
 	ControllerIndex = Main.Element.ApiControllerIndex
+	Version = Elements(ApiVersionIndex)
+	ElementLastIndex = Elements.Length - 1
 	If ElementLastIndex > ControllerIndex Then
 		FirstIndex = ControllerIndex + 1
 		FirstElement = Elements(FirstIndex)

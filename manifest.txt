@@ -1,0 +1,3 @@
+Version=1.08
+CustomClassTemplates=Controller (Api)|apicontroller,Controller (Find)|findcontroller,Controller (Web)|webcontroller,Controller (Web+Api)|webapicontroller
+Supported Platforms=B4J

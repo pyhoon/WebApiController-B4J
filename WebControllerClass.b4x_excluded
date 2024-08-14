@@ -1,17 +1,13 @@
 ﻿' Web Controller
-' Version 1.07
+' Version 1.08
 Sub Class_Globals
 	Private Request As ServletRequest 'ignore
 	Private Response As ServletResponse
-	Private HRM As HttpResponseMessage
-	Private DB As MiniORM
 End Sub
 
 Public Sub Initialize (req As ServletRequest, resp As ServletResponse)
 	Request = req
 	Response = resp
-	HRM.Initialize
-	DB.Initialize(Main.DBOpen, Main.DBEngine)
 End Sub
 
 Public Sub ShowPage

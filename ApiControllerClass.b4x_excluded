@@ -1,5 +1,5 @@
 ﻿' Api Controller
-' Version 1.07
+' Version 1.08
 Sub Class_Globals
 	Private Request As ServletRequest
 	Private Response As ServletResponse
@@ -7,16 +7,12 @@ Sub Class_Globals
 	Private DB As MiniORM
 	Private Method As String
 	Private Version As String
-	Private RequestURI As String 'ignore
 	Private Elements() As String
-	Private ElementLastIndex As Int
 	Private ApiVersionIndex As Int
 	Private ControllerIndex As Int
-	Private ControllerElement As String 'ignore
+	Private ElementLastIndex As Int
 	Private FirstIndex As Int
 	Private FirstElement As String
-	Private SecondIndex As Int 'ignore
-	Private SecondElement As String 'ignore
 End Sub
 
 Public Sub Initialize (req As ServletRequest, resp As ServletResponse)
@@ -43,13 +39,12 @@ Private Sub ReturnErrorUnprocessableEntity
 	WebApiUtils.ReturnErrorUnprocessableEntity(Response)
 End Sub
 
+' Api Router
 Public Sub RouteApi
 	Method = Request.Method.ToUpperCase
-	RequestURI = Request.RequestURI
-	Elements = WebApiUtils.GetUriElements(RequestURI)
+	Elements = WebApiUtils.GetUriElements(Request.RequestURI)
 	ApiVersionIndex = Main.Element.ApiVersionIndex
 	ControllerIndex = Main.Element.ApiControllerIndex
-	ControllerElement = Elements(ControllerIndex)
 	Version = Elements(ApiVersionIndex)
 	ElementLastIndex = Elements.Length - 1
 	If ElementLastIndex > ControllerIndex Then
@@ -66,31 +61,6 @@ Public Sub RouteApi
 			'RoutePut
 		Case "DELETE"
 			'RouteDelete
-		Case Else
-			Log("Unsupported method: " & Method)
-			ReturnMethodNotAllow
-	End Select
-End Sub
-
-Public Sub RouteWeb
-	Method = Request.Method.ToUpperCase
-	RequestURI = Request.RequestURI
-	Elements = WebApiUtils.GetUriElements(RequestURI)
-	ElementLastIndex = Elements.Length - 1
-	ControllerIndex = Main.Element.WebControllerIndex
-	ControllerElement = Elements(ControllerIndex)
-	If ElementLastIndex > ControllerIndex Then
-		FirstIndex = ControllerIndex + 1
-		FirstElement = Elements(FirstIndex)
-	End If
-	
-	Select Method
-		Case "GET"
-			Select ElementLastIndex
-				Case ControllerIndex
-					'ShowPage
-					Return
-			End Select
 		Case Else
 			Log("Unsupported method: " & Method)
 			ReturnMethodNotAllow
